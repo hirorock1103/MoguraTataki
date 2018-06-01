@@ -8,7 +8,7 @@ import java.util.Random;
  * Created by amb01 on 2018/05/30.
  */
 
-public class CircleCharacter {
+public class Mole {
 
     //移動用に使用する
     private int x = 0;
@@ -36,8 +36,7 @@ public class CircleCharacter {
     Random random = new Random();
 
 
-
-    CircleCharacter(int x, int y, int r){
+    Mole(int x, int y, int r) {
 
         this.x = x;
         this.y = y;
@@ -53,82 +52,80 @@ public class CircleCharacter {
 
     }
 
-    public int getLocationX(){
+    public int getLocationX() {
         return this.x;
     }
 
-    public int getLocationY(){
+    public int getLocationY() {
         return this.y;
     }
 
-    public int getFirstLocationX(){
+    public int getFirstLocationX() {
         return this.f_x;
     }
 
-    public int getFirstLocationY(){
+    public int getFirstLocationY() {
         return this.f_y;
     }
 
-    public int getRadius(){
+    public int getRadius() {
         return this.r;
     }
 
-    public void setLocationX(int x){
+    public void setLocationX(int x) {
         this.x = x;
     }
 
-    public void setLocationY(int y){
+    public void setLocationY(int y) {
         this.y = y;
     }
 
-    public void moveRight(int right){
+    public void moveRight(int right) {
         this.x += right;
     }
 
-    public void moveLeft(int left){
+    public void moveLeft(int left) {
         this.x -= left;
     }
 
-    public void moveTop(int top){
-
+    public void moveTop(int top) {
         long currentTime = System.currentTimeMillis();
 
-        //待機時間を超えた場合に
-        if( currentTime > nextmoveTime ){
-
-            //右移動
-            if(move == true){
-                this.y -= top;
-                if( (this.f_y - this.y ) >= moveLimit ){
-                    move = false;
-                    nextmoveTime = currentTime + (50 * (random.nextInt(8) + 2));
-                }
-            }else{
-
-                this.y += top;
-                if( (this.f_y - this.y ) <= 0 ){
-                    move = true;
-                    //nextMoveTimeをセット
-                    nextmoveTime = currentTime + (1000 * (random.nextInt(8) + 2));
-                }
+        // 上移動
+        if (move == true) {
+            this.y -= top;
+            if ((this.f_y - this.y) >= moveLimit) {
+                move = false;
+                nextmoveTime = currentTime + (50 * (random.nextInt(8) + 2));
             }
-
+        } else {
+            this.y += top;
+            if ((this.f_y - this.y) <= 0) {
+                move = true;
+                //nextMoveTimeをセット
+                nextmoveTime = currentTime + (1000 * (random.nextInt(8) + 2));
+            }
         }
-
-
 
     }
 
-    public void appear(){
+    public void action() {
         moveTop(moveSpeed);
     }
 
-    public void moveBottom(int bottom){
+    public void moveBottom(int bottom) {
         this.y += bottom;
     }
 
-    public void setRadius(int r){
+    public void setRadius(int r) {
         this.r = r;
     }
 
+    public boolean wakeUp() {
+        long currentTime = System.currentTimeMillis();
+
+        return currentTime > nextmoveTime;
+    }
+
+    //待機時間を超えた場合に
 }

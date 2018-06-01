@@ -23,7 +23,7 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
 
     private SurfaceHolder holder;
     private Thread thread;
-    ArrayList<CircleCharacter> charas = new ArrayList<>();
+    ArrayList<Mole> charas = new ArrayList<>();
     private int characterAmount = 4;
     private Random random;
     private Bitmap droid;
@@ -60,25 +60,25 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
 
         for(int i = 0; i <  characterAmount; i++){
             if(i == 0 ){
-                CircleCharacter circle = new CircleCharacter(
+                Mole circle = new Mole(
                         100,
                         250,
                         radius);
                 charas.add(circle);
             }else if(i == 1){
-                CircleCharacter circle = new CircleCharacter(
+                Mole circle = new Mole(
                         500,
                         250,
                         radius);
                 charas.add(circle);
             }else if(i == 2){
-                CircleCharacter circle = new CircleCharacter(
+                Mole circle = new Mole(
                         100,
                         600,
                         radius);
                 charas.add(circle);
             }else if(i == 3){
-                CircleCharacter circle = new CircleCharacter(
+                Mole circle = new Mole(
                         500,
                         600,
                         radius);
@@ -121,46 +121,47 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
             Canvas canvas = holder.lockCanvas();
             canvas.drawColor(Color.WHITE);
             //canvas.drawCircle(x,y,r+=2, paint);
-            for(CircleCharacter circle : charas){
+            for(Mole mole : charas){
 
                 //自身のポジションへ移動
                 //canvas.drawCircle(circle.getLocationX(),circle.getLocationY(),circle.getRadius(),paint);
                 //canvas.drawCircle(circle.getFirstLocationX(),circle.getFirstLocationY(),circle.getRadius(),paint);
                 //oval
 
-                int x = circle.getRadius() - (circle.getRadius() * 2) ;
-                int y = circle.getRadius() - (circle.getRadius() * 2) ;
+                int x = mole.getRadius() - (mole.getRadius() * 2) ;
+                int y = mole.getRadius() - (mole.getRadius() * 2) ;
 
                 x += 100;
                 y += -30;
 
                 RectF rect = new RectF(
-                        circle.getFirstLocationX() + x,
-                        circle.getFirstLocationY() + y ,
-                        circle.getFirstLocationX() + x + (circle.getRadius() * 2),
-                        circle.getFirstLocationY() + y + circle.getRadius());
+                        mole.getFirstLocationX() + x,
+                        mole.getFirstLocationY() + y ,
+                        mole.getFirstLocationX() + x + (mole.getRadius() * 2),
+                        mole.getFirstLocationY() + y + mole.getRadius());
 
                 //canvas.drawOval(rect, paint);
 
                 canvas.drawRect(rect,paint);
 
 
-                canvas.drawBitmap(droid, circle.getLocationX(), circle.getLocationY(),null);
+                canvas.drawBitmap(droid, mole.getLocationX(), mole.getLocationY(),null);
 
                 //hide用
                 canvas.drawRect(
-                        circle.getFirstLocationX() -30,
-                        circle.getFirstLocationY() -30,
-                        circle.getFirstLocationX() + 230,
-                        circle.getFirstLocationY() + 230,
+                        mole.getFirstLocationX() -30,
+                        mole.getFirstLocationY() -30,
+                        mole.getFirstLocationX() + 230,
+                        mole.getFirstLocationY() + 230,
                         paint_hide);
 
                 //Log.i("INFO", "x:" + circle.getFirstLocationX());
                 //Log.i("INFO", "y:" + circle.getFirstLocationY());
 
 
-                circle.appear();
-
+                if (mole.wakeUp()) {
+                    mole.action();
+                }
             }
 
             holder.unlockCanvasAndPost(canvas);

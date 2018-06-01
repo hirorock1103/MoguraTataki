@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.design_phantom.myapp_game20180526_1.MainActivity">
+    tools:context="com.design_phantom.myapp_game20180526_1.GameActivity">
 
     <SurfaceView
         android:id="@+id/surfaceView"
