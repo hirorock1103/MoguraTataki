@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.design_phantom.myapp_game20180526_1">
+    package="com.design_phantom.mogura_tataki">
 
     <application
         android:allowBackup="true"
