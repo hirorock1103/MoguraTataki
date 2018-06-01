@@ -1,12 +1,7 @@
-package com.design_phantom.myapp_game20180526_1;
+package com.design_phantom.mogura_tataki;
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
 
 public class GameActivity extends AppCompatActivity {
 

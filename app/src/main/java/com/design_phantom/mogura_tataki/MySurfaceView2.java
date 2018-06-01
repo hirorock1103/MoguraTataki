@@ -1,4 +1,4 @@
-package com.design_phantom.myapp_game20180526_1;
+package com.design_phantom.mogura_tataki;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -11,6 +11,8 @@ import android.graphics.RectF;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import com.design_phantom.myapp_game20180526_1.R;
 
 import java.util.ArrayList;
 import java.util.Random;

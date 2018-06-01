@@ -1,4 +1,4 @@
-package com.design_phantom.myapp_game20180526_1;
+package com.design_phantom.mogura_tataki;
 
 import android.util.Log;
 
