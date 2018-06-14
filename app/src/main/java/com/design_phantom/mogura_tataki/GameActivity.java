@@ -4,7 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.SurfaceView;
 
-import com.design_phantom.myapp_game20180526_1.R;
+import com.design_phantom.mogura_tataki.R;
 
 public class GameActivity extends AppCompatActivity {
 
