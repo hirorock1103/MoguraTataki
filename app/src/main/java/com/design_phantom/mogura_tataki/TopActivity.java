@@ -24,5 +24,14 @@ public class TopActivity extends AppCompatActivity {
             }
         });
 
+        final Button buttonRanking = this.findViewById(R.id.buttonRanking);
+        buttonRanking.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(TopActivity.this, RankingActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 }

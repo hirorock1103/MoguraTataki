@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -28,6 +29,7 @@ import java.util.Random;
 public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callback, Runnable, View.OnTouchListener {
 
     private final static int MOLENUMBER = 10;
+    private final static int GAMEMILLITIME = 10000;
     private SurfaceHolder holder;
     private Thread thread;
     private ArrayList<Mole> moleList;
@@ -36,6 +38,7 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
     private int attackSoundId;
     private int shoutSoundId;
     private int hitMoleCount = 0;
+    private int fontStartSize = 600;
 
 
     public MySurfaceView2(Context context) {
@@ -142,6 +145,7 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
         thread = new Thread(this);
         thread.start();
 
+
     }
 
     @Override
@@ -167,17 +171,23 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
         paint_hide.setColor(Color.WHITE);
         paint_hide.setStyle(Paint.Style.FILL);
 
+        int i = GAMEMILLITIME;
         while(thread != null){
 
             Canvas canvas = holder.lockCanvas();
 
             //キャンバス背景色
             canvas.drawColor(Color.WHITE);
+            paint.setTextSize(100);
+            canvas.drawText("Hit : " , 10.0f, 80.0f, paint);
+
+            fontStartSize = (fontStartSize-40) > 100 ? fontStartSize-40 : 100;
+            paint.setTextSize(fontStartSize);
+            canvas.drawText(String.valueOf(hitMoleCount), 250.0f, 80.0f, paint);
+
+
 
             for(Mole mole : moleList){
-
-                paint.setTextSize(100);
-                canvas.drawText("Hit : " + hitMoleCount, 30.0f, 80.0f, paint);
 
                 //穴用
                 RectF rect = new RectF(
@@ -228,6 +238,8 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
                     mole.shout(soundPool, shoutSoundId);
                     //もぐらたたいたカウントを保存
                     hitMoleCount++;
+                    //
+                    fontStartSize = 600;
                 }
             }
 
