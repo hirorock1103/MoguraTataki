@@ -30,7 +30,7 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
     private final static int MOLENUMBER = 10;
     private SurfaceHolder holder;
     private Thread thread;
-    private ArrayList<Mole2> moleList;
+    private ArrayList<Mole> moleList;
     private Bitmap moleImage;
     private SoundPool soundPool;
     private int attackSoundId;
@@ -121,7 +121,7 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
                     }
 
                     //もぐらを作成
-                    Mole2 mole = new Mole2(
+                    Mole mole = new Mole(
                             (j * imageWidth) + marginLeft,
                             i * imageHeight + 250,
                             imageWidth,
@@ -174,7 +174,7 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
             //キャンバス背景色
             canvas.drawColor(Color.WHITE);
 
-            for(Mole2 mole : moleList){
+            for(Mole mole : moleList){
 
                 paint.setTextSize(100);
                 canvas.drawText("Hit : " + hitMoleCount, 30.0f, 80.0f, paint);
@@ -219,7 +219,7 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
         //攻撃音
         //soundPool.play(attackSoundId,1.0F, 1.0F, 0, 0, 1);
 
-        for(Mole2 mole : moleList){
+        for(Mole mole : moleList){
 
             if(mole.isRestInHole() == false && mole.isReaction() == false){
                 //もぐらHit判定
