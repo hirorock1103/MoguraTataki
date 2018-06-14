@@ -1,16 +1,20 @@
 package com.design_phantom.mogura_tataki;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.Toast;
 
 import com.design_phantom.myapp_game20180526_1.R;
 
@@ -18,75 +22,121 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Created by amb01 on 2018/05/30.
+ * Created by amb01 on 2018/06/01.
  */
 
-public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callback,Runnable {
+public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callback, Runnable, View.OnTouchListener {
 
+    private final static int MOLENUMBER = 10;
     private SurfaceHolder holder;
     private Thread thread;
-    ArrayList<Mole> charas = new ArrayList<>();
-    private int characterAmount = 4;
-    private Random random;
-    private Bitmap droid;
+    private ArrayList<Mole2> moleList;
+    private Bitmap moleImage;
+    private SoundPool soundPool;
+    private int attackSoundId;
+    private int shoutSoundId;
+    private int hitMoleCount = 0;
+
 
     public MySurfaceView2(Context context) {
 
         super(context);
         holder = getHolder();
         holder.addCallback(this);
-        random = new Random();
-    }
+        setOnTouchListener(this);
 
+        soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
+        soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+            @Override
+            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+                if(status == 0){
+                    Toast.makeText(getContext(),"LoadComplete",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        attackSoundId = soundPool.load(getContext(),R.raw.attack,1);
+        shoutSoundId = soundPool.load(getContext(),R.raw.shout,1);
+
+    }
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
-        Random r = new Random();
-        r.nextInt();
+        moleList = new ArrayList<>();
 
-        Resources rcs = getResources();
-        //droid = BitmapFactory.decodeResource(rcs, R.drawable.blink);
-        droid = BitmapFactory.decodeResource(rcs, R.drawable.mini_mogura);
+        //set Image
+        moleImage = BitmapFactory.decodeResource(getResources(), R.drawable.mini_mogura);
 
-        int width = this.getWidth();
-        int height = this.getHeight();
+        //画面サイズ(px)
+        int width = getWidth();
+        int height = getHeight();
 
-        Log.i("INFO", "width : " + width);
-        Log.i("INFO", "height : " + height);
+        //画像大きさ
+        int imageWidth = moleImage.getWidth();
+        int imageHeight = moleImage.getHeight();
+
+        //SCORE部分の高さ
+        int scoreHeight = 200;
+
+        //もぐらを何匹セットできるか　
+        int widthSattable = width / imageWidth;
+        int heightSattable = (height-scoreHeight) / imageHeight;
+
+        //セットできる最大数
+        int maxCount = widthSattable * heightSattable;
+
+        //余白
+        int spaceWidth = getWidth() - (widthSattable * imageWidth);
+        int spaceHeight = getHeight() - (heightSattable * imageHeight);
 
 
 
-        //キャラクターを作成、自身のポジションへセット
-        int radius = 150;
+        if(MOLENUMBER > maxCount){
+            //上限を超えています
+        }else{
+            Random rand = new Random();
+            //もぐらをセット
+            int roopCount = 0;
+            int setCount = 0;
+            for(int i = 0; i < heightSattable; i++){
 
-        for(int i = 0; i <  characterAmount; i++){
-            if(i == 0 ){
-                Mole circle = new Mole(
-                        100,
-                        250,
-                        radius);
-                charas.add(circle);
-            }else if(i == 1){
-                Mole circle = new Mole(
-                        500,
-                        250,
-                        radius);
-                charas.add(circle);
-            }else if(i == 2){
-                Mole circle = new Mole(
-                        100,
-                        600,
-                        radius);
-                charas.add(circle);
-            }else if(i == 3){
-                Mole circle = new Mole(
-                        500,
-                        600,
-                        radius);
-                charas.add(circle);
+                //１行あたりの余白
+                int marginLeft = spaceWidth / widthSattable;
+
+                for(int j = 0; j < widthSattable; j++){
+
+                    roopCount++;
+
+                    //設定値に達した
+                    if(setCount == MOLENUMBER){
+                        continue;
+                    }
+
+                    //残数に余裕がある場合ランダムで処理抜ける
+                    if(setCount < (maxCount - roopCount)){
+                        if(rand.nextInt(3) != 1){
+                            continue;
+                        }
+                    }
+
+                    //もぐらを作成
+                    Mole2 mole = new Mole2(
+                            (j * imageWidth) + marginLeft,
+                            i * imageHeight + 250,
+                            imageWidth,
+                            imageHeight
+                    );
+
+                    Log.i("INFO" , "mole : " + mole.toString());
+
+                    moleList.add(mole);
+
+                    //作成カウント
+                    setCount++;
+
+                }
             }
-
         }
 
         thread = new Thread(this);
@@ -107,74 +157,82 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
     @Override
     public void run() {
 
+        //穴用
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.FILL);
 
-
+        //もぐら隠す用
         Paint paint_hide = new Paint();
         paint_hide.setColor(Color.WHITE);
         paint_hide.setStyle(Paint.Style.FILL);
 
-
-
         while(thread != null){
 
             Canvas canvas = holder.lockCanvas();
+
+            //キャンバス背景色
             canvas.drawColor(Color.WHITE);
-            //canvas.drawCircle(x,y,r+=2, paint);
-            for(Mole mole : charas){
 
-                //自身のポジションへ移動
-                //canvas.drawCircle(circle.getLocationX(),circle.getLocationY(),circle.getRadius(),paint);
-                //canvas.drawCircle(circle.getFirstLocationX(),circle.getFirstLocationY(),circle.getRadius(),paint);
-                //oval
+            for(Mole2 mole : moleList){
 
-                int x = mole.getRadius() - (mole.getRadius() * 2) ;
-                int y = mole.getRadius() - (mole.getRadius() * 2) ;
+                paint.setTextSize(100);
+                canvas.drawText("Hit : " + hitMoleCount, 30.0f, 80.0f, paint);
 
-                x += 100;
-                y += -30;
-
+                //穴用
                 RectF rect = new RectF(
-                        mole.getFirstLocationX() + x,
-                        mole.getFirstLocationY() + y ,
-                        mole.getFirstLocationX() + x + (mole.getRadius() * 2),
-                        mole.getFirstLocationY() + y + mole.getRadius());
+                        mole.getFirstLocationX(),
+                        mole.getFirstLocationY(),
+                        mole.getFirstLocationX() + mole.getWidth(),
+                        mole.getFirstLocationY() + mole.getHeight() / 4
+                );
 
                 //canvas.drawOval(rect, paint);
-
                 canvas.drawRect(rect,paint);
 
-
-                canvas.drawBitmap(droid, mole.getLocationX(), mole.getLocationY(),null);
+                canvas.drawBitmap(moleImage, mole.getLocationX(), mole.getLocationY(),null);
 
                 //hide用
                 canvas.drawRect(
-                        mole.getFirstLocationX() -30,
-                        mole.getFirstLocationY() -30,
-                        mole.getFirstLocationX() + 230,
-                        mole.getFirstLocationY() + 230,
+                        mole.getFirstLocationX() ,
+                        mole.getFirstLocationY() + mole.getHeight()/4,
+                        mole.getFirstLocationX() + mole.getWidth(),
+                        mole.getFirstLocationY() + mole.getHeight() + 10,
                         paint_hide);
 
-                //Log.i("INFO", "x:" + circle.getFirstLocationX());
-                //Log.i("INFO", "y:" + circle.getFirstLocationY());
-
-
-                if (mole.wakeUp()) {
-                    mole.action();
+                //もぐらが休憩中じゃないとき、もぐらは動く (身震い中は例外)
+                if(mole.isRest() == false ){
+                    mole.moleAction();
                 }
+
             }
 
             holder.unlockCanvasAndPost(canvas);
 
-//            try {
-//                Thread.sleep(100 * random.nextInt(6));
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
+        }
 
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+
+        //攻撃音
+        //soundPool.play(attackSoundId,1.0F, 1.0F, 0, 0, 1);
+
+        for(Mole2 mole : moleList){
+
+            if(mole.isRestInHole() == false && mole.isReaction() == false){
+                //もぐらHit判定
+                if(mole.isTouched((int)motionEvent.getX(), (int)motionEvent.getY())){
+                    //もぐら鳴き声
+                    mole.shout(soundPool, shoutSoundId);
+                    //もぐらたたいたカウントを保存
+                    hitMoleCount++;
+                }
+            }
 
         }
+
+        return false;
     }
 }

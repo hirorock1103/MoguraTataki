@@ -35,6 +35,8 @@ public class Mole {
     //次のアクションへのタイミング
     Random random = new Random();
 
+    //
+
 
     Mole(int x, int y, int r) {
 
@@ -86,6 +88,40 @@ public class Mole {
 
     public void moveLeft(int left) {
         this.x -= left;
+    }
+
+    public boolean isTouched(int x, int y){
+
+        Boolean isTouched = true;
+
+        //Hit
+        if(isTouched){
+
+            //show Hit!
+
+            //makeSound
+
+            //db処理?
+
+        }else{//ハズレ
+
+            //show miss!
+
+            //db処理?
+
+        }
+
+        return isTouched;
+    }
+
+    public void makeSound(){
+
+    }
+
+    public boolean isAppear(){
+
+
+        return true;
     }
 
     public void moveTop(int top) {
