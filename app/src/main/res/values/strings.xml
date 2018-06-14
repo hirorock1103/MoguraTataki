@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Myapp_game20180526_1</string>
+    <string name="app_name">mogura_tataki</string>
+    <string name="title_activity_top">TopActivity</string>
 </resources>

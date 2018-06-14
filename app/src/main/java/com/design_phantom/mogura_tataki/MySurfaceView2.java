@@ -16,7 +16,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Toast;
 
-import com.design_phantom.myapp_game20180526_1.R;
+import com.design_phantom.mogura_tataki.R;
 
 import java.util.ArrayList;
 import java.util.Random;

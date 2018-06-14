@@ -1,5 +1,6 @@
 package com.design_phantom.mogura_tataki;
 
+import android.graphics.Point;
 import android.util.Log;
 
 import java.util.Random;
@@ -52,6 +53,12 @@ public class Mole {
         long currentTime = System.currentTimeMillis();
         nextmoveTime = currentTime + (1000 * (random.nextInt(8) + 2));
 
+    }
+
+    public boolean touched (Point touchPoint) {
+        return true;
+//        return (this.x <= touchPoint.x && touchPoint.x <= this.x + this.width) &&
+//        (this.y <= touchPoint.y && touchPoint.y <= this.x + this.height);
     }
 
     public int getLocationX() {
