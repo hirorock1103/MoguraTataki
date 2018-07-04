@@ -1,8 +1,8 @@
 package com.design_phantom.mogura_tataki;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,24 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import net.arnx.jsonic.JSON;
 import net.arnx.jsonic.JSONReader;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.design_phantom.mogura_tataki.RankingActivity.MyData.ranking;
 
 public class RankingActivity extends AppCompatActivity {
 
@@ -35,8 +26,6 @@ public class RankingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranking);
-
-        Gson gson = new Gson();
 
         // JSONからフィールドにListを含むJavaオブジェクトへの変換
         String jsonStr = "{"
@@ -111,21 +100,6 @@ public class RankingActivity extends AppCompatActivity {
         recyclerView.setAdapter(new MyAdapter(list));
 
     }
-
-    public static class MyData{
-
-        public static Integer[] ranking = {
-                1,2,3,4,5,6,7,8,9,10,11
-        };
-        public static Integer[] score = {
-                34,31,20,28,25,23,22,18,17,10,9
-        };
-        public static String[] name = {
-                "AAAAAA", "FEREF","FEDDDD","GGGGGG","DFDSDF","REERER","Fdfdee","FFFFFF","Lkd","EDD","FFFFFF",
-        };
-
-    }
-
 
     private class MyAdapter extends RecyclerView.Adapter<MyViewHolder>{
 
