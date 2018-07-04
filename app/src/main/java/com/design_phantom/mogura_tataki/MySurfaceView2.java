@@ -150,11 +150,12 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-
+        Log.i("INFO","surfaceChanged");
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+        Log.i("INFO","surfaceDestroyed");
         thread = null;
     }
 
@@ -174,50 +175,58 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
         int i = GAMEMILLITIME;
         while(thread != null){
 
-            Canvas canvas = holder.lockCanvas();
-
-            //キャンバス背景色
-            canvas.drawColor(Color.WHITE);
-            paint.setTextSize(100);
-            canvas.drawText("Hit : " , 10.0f, 80.0f, paint);
-
-            fontStartSize = (fontStartSize-40) > 100 ? fontStartSize-40 : 100;
-            paint.setTextSize(fontStartSize);
-            canvas.drawText(String.valueOf(hitMoleCount), 250.0f, 80.0f, paint);
+            try{
 
 
+                Canvas canvas = holder.lockCanvas();
 
-            for(Mole mole : moleList){
+                //キャンバス背景色
+                canvas.drawColor(Color.WHITE);
+                paint.setTextSize(100);
+                canvas.drawText("Hit : " , 10.0f, 80.0f, paint);
 
-                //穴用
-                RectF rect = new RectF(
-                        mole.getFirstLocationX(),
-                        mole.getFirstLocationY(),
-                        mole.getFirstLocationX() + mole.getWidth(),
-                        mole.getFirstLocationY() + mole.getHeight() / 4
-                );
+                fontStartSize = (fontStartSize-40) > 100 ? fontStartSize-40 : 100;
+                paint.setTextSize(fontStartSize);
+                canvas.drawText(String.valueOf(hitMoleCount), 250.0f, 80.0f, paint);
 
-                //canvas.drawOval(rect, paint);
-                canvas.drawRect(rect,paint);
 
-                canvas.drawBitmap(moleImage, mole.getLocationX(), mole.getLocationY(),null);
 
-                //hide用
-                canvas.drawRect(
-                        mole.getFirstLocationX() ,
-                        mole.getFirstLocationY() + mole.getHeight()/4,
-                        mole.getFirstLocationX() + mole.getWidth(),
-                        mole.getFirstLocationY() + mole.getHeight() + 10,
-                        paint_hide);
+                for(Mole mole : moleList){
 
-                //もぐらが休憩中じゃないとき、もぐらは動く (身震い中は例外)
-                if(mole.isRest() == false ){
-                    mole.moleAction();
+                    //穴用
+                    RectF rect = new RectF(
+                            mole.getFirstLocationX(),
+                            mole.getFirstLocationY(),
+                            mole.getFirstLocationX() + mole.getWidth(),
+                            mole.getFirstLocationY() + mole.getHeight() / 4
+                    );
+
+                    //canvas.drawOval(rect, paint);
+                    canvas.drawRect(rect,paint);
+
+                    canvas.drawBitmap(moleImage, mole.getLocationX(), mole.getLocationY(),null);
+
+                    //hide用
+                    canvas.drawRect(
+                            mole.getFirstLocationX() ,
+                            mole.getFirstLocationY() + mole.getHeight()/4,
+                            mole.getFirstLocationX() + mole.getWidth(),
+                            mole.getFirstLocationY() + mole.getHeight() + 10,
+                            paint_hide);
+
+                    //もぐらが休憩中じゃないとき、もぐらは動く (身震い中は例外)
+                    if(mole.isRest() == false ){
+                        mole.moleAction();
+                    }
+
                 }
 
+                holder.unlockCanvasAndPost(canvas);
+
+            }catch(Exception e){
+                Log.i("INFO", e.getMessage());
             }
 
-            holder.unlockCanvasAndPost(canvas);
 
         }
 
