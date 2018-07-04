@@ -14,8 +14,12 @@ import android.widget.TextView;
 import net.arnx.jsonic.JSON;
 import net.arnx.jsonic.JSONReader;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,30 +32,40 @@ public class RankingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ranking);
 
         // JSONからフィールドにListを含むJavaオブジェクトへの変換
-        String jsonStr = "{"
-                +"  \"ranking\": ["
-                +"    {"
-                +"        \"ranking_id\": 10,"
-                +"            \"rank\": 20,"
-                +"            \"level\": \"3\","
-                +"            \"hit_count\": 5,"
-                +"            \"miss_count\": \"10\","
-                +"            \"player_name\": \"cc\","
-                +"            \"createdate\": \"2018-06-15 12:00:00\","
-                +"            \"updatedate\": \"2018-06-15 12:00:00\""
-                +"    }"
+        URL url = null;
+        String jsonStr = "";
+        try {
+            url = new URL("http://mdiz1103.xsrv.jp/ranking.php");
+            InputStream in = url.openStream();
+            BufferedReader reader2 = new BufferedReader(new InputStreamReader(in));
+            jsonStr = reader2.toString();
+        } catch ( Exception e) {
+            e.printStackTrace();
+        }
+//        String jsonStr = "{"
+//                +"  \"ranking\": ["
 //                +"    {"
-//                +"        \"ranking_id\": \"\","
-//                +"            \"rank\": \"\","
-//                +"            \"level\": \"\","
-//                +"            \"hit_count\": \"\","
-//                +"            \"miss_count\": \"\","
-//                +"            \"player_name\": \"\","
-//                +"            \"createdate\": \"\","
-//                +"            \"updatedate\": \"\""
+//                +"        \"ranking_id\": 10,"
+//                +"            \"rank\": 20,"
+//                +"            \"level\": \"3\","
+//                +"            \"hit_count\": 5,"
+//                +"            \"miss_count\": \"10\","
+//                +"            \"player_name\": \"cc\","
+//                +"            \"createdate\": \"2018-06-15 12:00:00\","
+//                +"            \"updatedate\": \"2018-06-15 12:00:00\""
 //                +"    }"
-                +"  ]"
-                +"}";
+////                +"    {"
+////                +"        \"ranking_id\": \"\","
+////                +"            \"rank\": \"\","
+////                +"            \"level\": \"\","
+////                +"            \"hit_count\": \"\","
+////                +"            \"miss_count\": \"\","
+////                +"            \"player_name\": \"\","
+////                +"            \"createdate\": \"\","
+////                +"            \"updatedate\": \"\""
+////                +"    }"
+//                +"  ]"
+//                +"}";
         JSONReader reader = new JSON().getReader(jsonStr);
         try {
             reader.next();
@@ -201,10 +215,5 @@ public class RankingActivity extends AppCompatActivity {
             this.regDate = regDate;
         }
     }
-
-
-
-
-
 
 }
