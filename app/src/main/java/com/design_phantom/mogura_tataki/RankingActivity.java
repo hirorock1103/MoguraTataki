@@ -12,8 +12,22 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import net.arnx.jsonic.JSON;
+import net.arnx.jsonic.JSONReader;
+
+import java.io.IOException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.design_phantom.mogura_tataki.RankingActivity.MyData.ranking;
 
 public class RankingActivity extends AppCompatActivity {
 
@@ -21,6 +35,51 @@ public class RankingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranking);
+
+        Gson gson = new Gson();
+
+        // JSONからフィールドにListを含むJavaオブジェクトへの変換
+        String jsonStr = "{"
+                +"  \"ranking\": ["
+                +"    {"
+                +"        \"ranking_id\": 10,"
+                +"            \"rank\": 20,"
+                +"            \"level\": \"3\","
+                +"            \"hit_count\": 5,"
+                +"            \"miss_count\": \"10\","
+                +"            \"player_name\": \"cc\","
+                +"            \"createdate\": \"2018-06-15 12:00:00\","
+                +"            \"updatedate\": \"2018-06-15 12:00:00\""
+                +"    }"
+//                +"    {"
+//                +"        \"ranking_id\": \"\","
+//                +"            \"rank\": \"\","
+//                +"            \"level\": \"\","
+//                +"            \"hit_count\": \"\","
+//                +"            \"miss_count\": \"\","
+//                +"            \"player_name\": \"\","
+//                +"            \"createdate\": \"\","
+//                +"            \"updatedate\": \"\""
+//                +"    }"
+                +"  ]"
+                +"}";
+        JSONReader reader = new JSON().getReader(jsonStr);
+        try {
+            reader.next();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Map<?, ?> map = null;
+        try {
+            map = reader.getMap();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        List<Map> rankingData = (List) map.get("ranking");
+//
+//        for( Map ranking:rankingData ) {
+//            System.out.println(ranking.get("ranking_id"));
+//        }
 
         final Button button_back_to_top = findViewById(R.id.button_back_to_top);
         button_back_to_top.setOnClickListener(new View.OnClickListener() {
@@ -35,12 +94,12 @@ public class RankingActivity extends AppCompatActivity {
 
         ArrayList<RankingCard> list = new ArrayList<>();
 
-        for(int i = 0; i < MyData.ranking.length; i++){
+        for( Map<String, Object> ranking:rankingData ) {
             list.add(new RankingCard(
-                    MyData.ranking[i],
-                    MyData.score[i],
-                    MyData.name[i],
-                    "2018/03/02"
+                    ((BigDecimal)ranking.get("rank")).intValue(),
+                    ((BigDecimal)ranking.get("hit_count")).intValue(),
+                    ranking.get("player_name").toString(),
+                    ranking.get("createdate").toString()
             ));
         }
 
