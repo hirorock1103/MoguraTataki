@@ -1,6 +1,8 @@
 package com.design_phantom.mogura_tataki;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,63 +28,72 @@ import java.util.Map;
 
 public class RankingActivity extends AppCompatActivity {
 
+    // JSONからフィールドにListを含むJavaオブジェクトへの変換
+    private String jsonStr = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranking);
 
-        // JSONからフィールドにListを含むJavaオブジェクトへの変換
-        URL url = null;
-        String jsonStr = "";
-        try {
-            url = new URL("http://mdiz1103.xsrv.jp/ranking.php");
-            InputStream in = url.openStream();
-            BufferedReader reader2 = new BufferedReader(new InputStreamReader(in));
-            jsonStr = reader2.toString();
-        } catch ( Exception e) {
-            e.printStackTrace();
-        }
-//        String jsonStr = "{"
-//                +"  \"ranking\": ["
-//                +"    {"
-//                +"        \"ranking_id\": 10,"
-//                +"            \"rank\": 20,"
-//                +"            \"level\": \"3\","
-//                +"            \"hit_count\": 5,"
-//                +"            \"miss_count\": \"10\","
-//                +"            \"player_name\": \"cc\","
-//                +"            \"createdate\": \"2018-06-15 12:00:00\","
-//                +"            \"updatedate\": \"2018-06-15 12:00:00\""
-//                +"    }"
-////                +"    {"
-////                +"        \"ranking_id\": \"\","
-////                +"            \"rank\": \"\","
-////                +"            \"level\": \"\","
-////                +"            \"hit_count\": \"\","
-////                +"            \"miss_count\": \"\","
-////                +"            \"player_name\": \"\","
-////                +"            \"createdate\": \"\","
-////                +"            \"updatedate\": \"\""
-////                +"    }"
-//                +"  ]"
-//                +"}";
-        JSONReader reader = new JSON().getReader(jsonStr);
-        try {
-            reader.next();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Map<?, ?> map = null;
-        try {
-            map = reader.getMap();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        List<Map> rankingData = (List) map.get("ranking");
-//
-//        for( Map ranking:rankingData ) {
-//            System.out.println(ranking.get("ranking_id"));
-//        }
+        AsyncTask task = new AsyncTask<Object, Object, String>() {
+            @Override
+            protected String doInBackground(Object[] object) {
+                String json = "";;
+                try {
+                    URL webApiUrl = new URL("http://mdiz1103.xsrv.jp/ranking.php");
+                    InputStream in = webApiUrl.openStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    json = reader.readLine();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return json;
+            }
+
+            @Override
+            protected void onPostExecute(String json) {
+                super.onPostExecute(json);
+                System.out.println(json);
+                jsonStr = json;
+
+                JSONReader reader = new JSON().getReader(jsonStr);
+                try {
+                    reader.next();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Map<?, ?> map = null;
+                try {
+                    map = reader.getMap();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                List<Map> rankingData = (List) map.get("ranking");
+
+                //web上からランキング情報を取得する
+
+                ArrayList<RankingCard> list = new ArrayList<>();
+
+                for (Map<String, Object> ranking : rankingData) {
+                    list.add(new RankingCard(
+                            ((BigDecimal) ranking.get("rank")).intValue(),
+                            ((BigDecimal) ranking.get("hit_count")).intValue(),
+                            ranking.get("player_name").toString(),
+                            ranking.get("createdate").toString()
+                    ));
+                }
+
+                RecyclerView recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+                recyclerView.setHasFixedSize(true);
+                LinearLayoutManager llManager = new LinearLayoutManager(RankingActivity.this);
+                llManager.setOrientation(LinearLayoutManager.VERTICAL);
+                recyclerView.setLayoutManager(llManager);
+                recyclerView.setAdapter(new MyAdapter(list));
+
+            }
+        };
+        task.execute();
 
         final Button button_back_to_top = findViewById(R.id.button_back_to_top);
         button_back_to_top.setOnClickListener(new View.OnClickListener() {
@@ -93,33 +104,13 @@ public class RankingActivity extends AppCompatActivity {
             }
         });
 
-        //web上からランキング情報を取得する
-
-        ArrayList<RankingCard> list = new ArrayList<>();
-
-        for( Map<String, Object> ranking:rankingData ) {
-            list.add(new RankingCard(
-                    ((BigDecimal)ranking.get("rank")).intValue(),
-                    ((BigDecimal)ranking.get("hit_count")).intValue(),
-                    ranking.get("player_name").toString(),
-                    ranking.get("createdate").toString()
-            ));
-        }
-
-        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.my_recycler_view);
-        recyclerView.setHasFixedSize(true);
-        LinearLayoutManager llManager = new LinearLayoutManager(this);
-        llManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(llManager);
-        recyclerView.setAdapter(new MyAdapter(list));
-
     }
 
-    private class MyAdapter extends RecyclerView.Adapter<MyViewHolder>{
+    private class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
         ArrayList<RankingCard> list;
 
-        MyAdapter(ArrayList<RankingCard> list){
+        MyAdapter(ArrayList<RankingCard> list) {
             this.list = list;
         }
 
@@ -149,8 +140,7 @@ public class RankingActivity extends AppCompatActivity {
     }
 
 
-
-    private class MyViewHolder extends RecyclerView.ViewHolder{
+    private class MyViewHolder extends RecyclerView.ViewHolder {
 
         View base;
         TextView rank;
@@ -176,7 +166,7 @@ public class RankingActivity extends AppCompatActivity {
         private String name;
         private String regDate;
 
-        RankingCard(int rank, int score,  String name, String regDate){
+        RankingCard(int rank, int score, String name, String regDate) {
             this.rank = rank;
             this.score = score;
             this.name = name;
