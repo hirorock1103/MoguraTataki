@@ -162,6 +162,8 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
     @Override
     public void run() {
 
+        long start = System.currentTimeMillis();
+
         //穴用
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
@@ -173,7 +175,10 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
         paint_hide.setStyle(Paint.Style.FILL);
 
         int i = GAMEMILLITIME;
-        while(thread != null){
+//        while(thread != null){
+//        int secondsOfGameTime = 30;
+        int secondsOfGameTime = 5;
+        while(System.currentTimeMillis() - start < secondsOfGameTime * 1000){
 
             try{
 
@@ -222,14 +227,10 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
                 }
 
                 holder.unlockCanvasAndPost(canvas);
-
             }catch(Exception e){
                 Log.i("INFO", e.getMessage());
             }
-
-
         }
-
     }
 
     @Override
