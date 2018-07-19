@@ -41,6 +41,7 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
     private int fontStartSize = 600;
 
 
+
     public MySurfaceView2(Context context) {
 
         super(context);
@@ -231,6 +232,10 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
                 Log.i("INFO", e.getMessage());
             }
         }
+
+        //ループ終了時
+        Toast.makeText(this.getContext(),"Finish Game!", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
