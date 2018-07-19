@@ -17,8 +17,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Toast;
 
-import com.design_phantom.mogura_tataki.R;
-
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -26,7 +24,7 @@ import java.util.Random;
  * Created by amb01 on 2018/06/01.
  */
 
-public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callback, Runnable, View.OnTouchListener {
+public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callback, View.OnTouchListener {
 
     private final static int MOLENUMBER = 10;
     private final static int GAMEMILLITIME = 10000;
@@ -44,6 +42,7 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
     public MySurfaceView2(Context context) {
 
         super(context);
+
         holder = getHolder();
         holder.addCallback(this);
         setOnTouchListener(this);
@@ -52,14 +51,14 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
         soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-                if(status == 0){
-                    Toast.makeText(getContext(),"LoadComplete",Toast.LENGTH_SHORT).show();
+                if (status == 0) {
+                    Toast.makeText(MySurfaceView2.this.getContext(), "LoadComplete", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        attackSoundId = soundPool.load(getContext(),R.raw.attack,1);
-        shoutSoundId = soundPool.load(getContext(),R.raw.shout,1);
+        attackSoundId = soundPool.load(getContext(), R.raw.attack, 1);
+        shoutSoundId = soundPool.load(getContext(), R.raw.shout, 1);
 
     }
 
@@ -84,7 +83,7 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
 
         //もぐらを何匹セットできるか　
         int widthSattable = width / imageWidth;
-        int heightSattable = (height-scoreHeight) / imageHeight;
+        int heightSattable = (height - scoreHeight) / imageHeight;
 
         //セットできる最大数
         int maxCount = widthSattable * heightSattable;
@@ -94,31 +93,30 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
         int spaceHeight = getHeight() - (heightSattable * imageHeight);
 
 
-
-        if(MOLENUMBER > maxCount){
+        if (MOLENUMBER > maxCount) {
             //上限を超えています
-        }else{
+        } else {
             Random rand = new Random();
             //もぐらをセット
             int roopCount = 0;
             int setCount = 0;
-            for(int i = 0; i < heightSattable; i++){
+            for (int i = 0; i < heightSattable; i++) {
 
                 //１行あたりの余白
                 int marginLeft = spaceWidth / widthSattable;
 
-                for(int j = 0; j < widthSattable; j++){
+                for (int j = 0; j < widthSattable; j++) {
 
                     roopCount++;
 
                     //設定値に達した
-                    if(setCount == MOLENUMBER){
+                    if (setCount == MOLENUMBER) {
                         continue;
                     }
 
                     //残数に余裕がある場合ランダムで処理抜ける
-                    if(setCount < (maxCount - roopCount)){
-                        if(rand.nextInt(3) != 1){
+                    if (setCount < (maxCount - roopCount)) {
+                        if (rand.nextInt(3) != 1) {
                             continue;
                         }
                     }
@@ -131,7 +129,7 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
                             imageHeight
                     );
 
-                    Log.i("INFO" , "mole : " + mole.toString());
+                    Log.i("INFO", "mole : " + mole.toString());
 
                     moleList.add(mole);
 
@@ -142,95 +140,105 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
             }
         }
 
-        thread = new Thread(this);
+        final Handler handler = new Handler();
+
+        thread = new Thread() {
+            @Override
+            public void run() {
+
+                long start = System.currentTimeMillis();
+
+                //穴用
+                Paint paint = new Paint();
+                paint.setColor(Color.BLACK);
+                paint.setStyle(Paint.Style.FILL);
+
+                //もぐら隠す用
+                Paint paint_hide = new Paint();
+                paint_hide.setColor(Color.WHITE);
+                paint_hide.setStyle(Paint.Style.FILL);
+
+                int i = GAMEMILLITIME;
+//        while(thread != null){
+//        int secondsOfGameTime = 30;
+                int secondsOfGameTime = 5;
+                while (System.currentTimeMillis() - start < secondsOfGameTime * 1000) {
+
+                    try {
+
+
+                        Canvas canvas = holder.lockCanvas();
+
+                        //キャンバス背景色
+                        canvas.drawColor(Color.WHITE);
+                        paint.setTextSize(100);
+                        canvas.drawText("Hit : ", 10.0f, 80.0f, paint);
+
+                        fontStartSize = (fontStartSize - 40) > 100 ? fontStartSize - 40 : 100;
+                        paint.setTextSize(fontStartSize);
+                        canvas.drawText(String.valueOf(hitMoleCount), 250.0f, 80.0f, paint);
+
+
+                        for (Mole mole : moleList) {
+
+                            //穴用
+                            RectF rect = new RectF(
+                                    mole.getFirstLocationX(),
+                                    mole.getFirstLocationY(),
+                                    mole.getFirstLocationX() + mole.getWidth(),
+                                    mole.getFirstLocationY() + mole.getHeight() / 4
+                            );
+
+                            //canvas.drawOval(rect, paint);
+                            canvas.drawRect(rect, paint);
+
+                            canvas.drawBitmap(moleImage, mole.getLocationX(), mole.getLocationY(), null);
+
+                            //hide用
+                            canvas.drawRect(
+                                    mole.getFirstLocationX(),
+                                    mole.getFirstLocationY() + mole.getHeight() / 4,
+                                    mole.getFirstLocationX() + mole.getWidth(),
+                                    mole.getFirstLocationY() + mole.getHeight() + 10,
+                                    paint_hide);
+
+                            //もぐらが休憩中じゃないとき、もぐらは動く (身震い中は例外)
+                            if (mole.isRest() == false) {
+                                mole.moleAction();
+                            }
+
+                        }
+
+                        holder.unlockCanvasAndPost(canvas);
+                    } catch (Exception e) {
+                        Log.i("INFO", e.getMessage());
+                    }
+                }
+
+                // ゲーム終了！
+                // * 終了メッセージを表示し
+                // * ランキング情報をAPIにPOSTする
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MySurfaceView2.this.getContext(), "Finish Game!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+        };
         thread.start();
-
-
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-        Log.i("INFO","surfaceChanged");
+        Log.i("INFO", "surfaceChanged");
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        Log.i("INFO","surfaceDestroyed");
+        Log.i("INFO", "surfaceDestroyed");
         thread = null;
-    }
-
-    @Override
-    public void run() {
-
-        long start = System.currentTimeMillis();
-
-        //穴用
-        Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setStyle(Paint.Style.FILL);
-
-        //もぐら隠す用
-        Paint paint_hide = new Paint();
-        paint_hide.setColor(Color.WHITE);
-        paint_hide.setStyle(Paint.Style.FILL);
-
-        int i = GAMEMILLITIME;
-//        while(thread != null){
-//        int secondsOfGameTime = 30;
-        int secondsOfGameTime = 5;
-        while(System.currentTimeMillis() - start < secondsOfGameTime * 1000){
-
-            try{
-
-
-                Canvas canvas = holder.lockCanvas();
-
-                //キャンバス背景色
-                canvas.drawColor(Color.WHITE);
-                paint.setTextSize(100);
-                canvas.drawText("Hit : " , 10.0f, 80.0f, paint);
-
-                fontStartSize = (fontStartSize-40) > 100 ? fontStartSize-40 : 100;
-                paint.setTextSize(fontStartSize);
-                canvas.drawText(String.valueOf(hitMoleCount), 250.0f, 80.0f, paint);
-
-
-
-                for(Mole mole : moleList){
-
-                    //穴用
-                    RectF rect = new RectF(
-                            mole.getFirstLocationX(),
-                            mole.getFirstLocationY(),
-                            mole.getFirstLocationX() + mole.getWidth(),
-                            mole.getFirstLocationY() + mole.getHeight() / 4
-                    );
-
-                    //canvas.drawOval(rect, paint);
-                    canvas.drawRect(rect,paint);
-
-                    canvas.drawBitmap(moleImage, mole.getLocationX(), mole.getLocationY(),null);
-
-                    //hide用
-                    canvas.drawRect(
-                            mole.getFirstLocationX() ,
-                            mole.getFirstLocationY() + mole.getHeight()/4,
-                            mole.getFirstLocationX() + mole.getWidth(),
-                            mole.getFirstLocationY() + mole.getHeight() + 10,
-                            paint_hide);
-
-                    //もぐらが休憩中じゃないとき、もぐらは動く (身震い中は例外)
-                    if(mole.isRest() == false ){
-                        mole.moleAction();
-                    }
-
-                }
-
-                holder.unlockCanvasAndPost(canvas);
-            }catch(Exception e){
-                Log.i("INFO", e.getMessage());
-            }
-        }
     }
 
     @Override
@@ -239,11 +247,11 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
         //攻撃音
         //soundPool.play(attackSoundId,1.0F, 1.0F, 0, 0, 1);
 
-        for(Mole mole : moleList){
+        for (Mole mole : moleList) {
 
-            if(mole.isRestInHole() == false && mole.isReaction() == false){
+            if (mole.isRestInHole() == false && mole.isReaction() == false) {
                 //もぐらHit判定
-                if(mole.isTouched((int)motionEvent.getX(), (int)motionEvent.getY())){
+                if (mole.isTouched((int) motionEvent.getX(), (int) motionEvent.getY())) {
                     //もぐら鳴き声
                     mole.shout(soundPool, shoutSoundId);
                     //もぐらたたいたカウントを保存
