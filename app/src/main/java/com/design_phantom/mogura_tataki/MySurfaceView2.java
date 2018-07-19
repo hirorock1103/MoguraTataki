@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -17,6 +18,12 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -162,7 +169,7 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
                 int i = GAMEMILLITIME;
 //        while(thread != null){
 //        int secondsOfGameTime = 30;
-                int secondsOfGameTime = 5;
+                int secondsOfGameTime = 10;
                 while (System.currentTimeMillis() - start < secondsOfGameTime * 1000) {
 
                     try {
@@ -215,10 +222,43 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
                         Log.i("INFO", e.getMessage());
                     }
                 }
+                //スコア
+                final String score = "rank=20&level=3&hit_count="+MySurfaceView2.this.hitMoleCount+"&miss_count=2&player_name=cc";
 
                 // ゲーム終了！
                 // * 終了メッセージを表示し
                 // * ランキング情報をAPIにPOSTする
+                AsyncTask task = new AsyncTask<Object, Object, Boolean>() {
+                    @Override
+                    protected Boolean doInBackground (Object[] object){
+                        boolean res = false;
+                        try {
+                            String url = "http://mdiz1103.xsrv.jp/ranking.php";
+                            HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+                            conn.setDoOutput(true);
+                            conn.setRequestMethod("POST");
+                            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;");
+                            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+                            out.write(score);
+                            out.close();
+
+                            InputStream in = conn.getInputStream();
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                            StringBuilder buf = new StringBuilder();
+                            String line;
+
+                            while ((line = reader.readLine()) != null) {
+                                buf.append(line);
+                            }
+                            res = true;
+                        }catch (Exception e){
+                            throw new RuntimeException(e);
+                        }
+                        return res;
+                    }
+                };
+                task.execute();
+
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
