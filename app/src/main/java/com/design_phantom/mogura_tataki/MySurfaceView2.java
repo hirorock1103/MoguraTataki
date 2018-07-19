@@ -39,6 +39,7 @@ public class MySurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
     private int fontStartSize = 600;
 
 
+
     public MySurfaceView2(Context context) {
 
         super(context);
